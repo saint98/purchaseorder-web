@@ -530,19 +530,7 @@ btnCreatePoll.addEventListener('click',async()=>{
         // Store admin URL for self-email
         window._adminUrl=adminUrl;
         setupVoteScreen(globalMeetingTitle,globalLocation,globalDesc,globalSlots);listenToLiveVotes();window.history.pushState(null,null,'#/poll/'+activePollId);switchScreen('share');
-        // Auto-send self email if organizer email provided
-        if(organizerEmail){
-            var nl=String.fromCharCode(10);
-            var slotList2=globalSlots.map(function(si){var s=typeof si==='string'?JSON.parse(si):si;return '  - '+s.display;}).join(nl);
-            var adminUrl2=window._adminUrl||doodleShareUrl.value;
-            var bt='SLOTIFY - MY POLL LINKS'+nl+nl
-                +'[ORGANIZER LINK - keep private]'+nl+adminUrl2+nl+nl
-                +'[PARTICIPANT LINK - share this]'+nl+doodleShareUrl.value+nl+nl
-                +'Title: '+globalMeetingTitle+nl
-                +'Location: '+(globalLocation||'Not specified')+nl+nl
-                +'Proposed slots:'+nl+slotList2;
-            window.location.href='mailto:'+encodeURIComponent(organizerEmail)+'?subject='+encodeURIComponent('My Slotify poll: '+globalMeetingTitle)+'&body='+encodeURIComponent(bt);
-        }
+
     }catch(e){
         console.error(e);
         alert(e.message==='TIMEOUT'?'Connection timeout. Check Firebase rules.':'Error: '+e.message);
@@ -596,8 +584,7 @@ document.getElementById('btn-close-modal2').addEventListener('click',()=>{
 });
 document.getElementById('btn-send-invites').addEventListener('click',()=>{
     var raw=document.getElementById('invite-emails').value;
-    var emails=raw.split(/[,
-]+/).map(function(e){return e.trim();}).filter(function(e){return e.length>0;});
+    var emails=raw.split(',').join('\n').split('\n').map(function(e){return e.trim();}).filter(function(e){return e.length>0;});
     if(emails.length===0){alert('Please enter at least one email address.');return;}
     var nl=String.fromCharCode(10);
     var slotList=globalSlots.map(function(si){var s=typeof si==='string'?JSON.parse(si):si;return '  - '+s.display;}).join(nl);
@@ -615,20 +602,7 @@ document.getElementById('btn-mailto').addEventListener('click',()=>{
     document.getElementById('email-modal').classList.remove('hidden');
     setTimeout(()=>document.getElementById('invite-emails').focus(),100);
 });
-document.getElementById('btn-mailto-self').addEventListener('click',()=>{
-    var nl=String.fromCharCode(10);
-    var slotList=globalSlots.map(function(si){var s=typeof si==='string'?JSON.parse(si):si;return '  - '+s.display;}).join(nl);
-    var adminUrl=window._adminUrl||doodleShareUrl.value;
-    var participantUrl=doodleShareUrl.value;
-    var bodyText='SLOTIFY - MY POLL LINKS'+nl+nl
-        +'[ORGANIZER LINK - keep private]'+nl+adminUrl+nl+nl
-        +'[PARTICIPANT LINK - share this]'+nl+participantUrl+nl+nl
-        +'Title: '+globalMeetingTitle+nl
-        +'Location: '+(globalLocation||'Not specified')+nl+nl
-        +'Proposed slots:'+nl+slotList+nl+nl
-        +'Open the organizer link from any device to edit the poll.';
-    window.location.href='mailto:?subject='+encodeURIComponent('My Slotify poll: '+globalMeetingTitle)+'&body='+encodeURIComponent(bodyText);
-});
+
 btnGoToVote.addEventListener('click',()=>switchScreen('vote'));
 btnBackToShare.addEventListener('click',()=>{ if(activePollId){if(!doodleShareUrl.value){const baseUrl=window.location.href.split('#')[0];doodleShareUrl.value=baseUrl+'#/poll/'+activePollId;}switchScreen('share');}else{switchScreen('create');}});
 

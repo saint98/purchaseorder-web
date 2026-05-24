@@ -584,7 +584,17 @@ document.getElementById('btn-close-modal2').addEventListener('click',()=>{
 });
 document.getElementById('btn-send-invites').addEventListener('click',()=>{
     var raw=document.getElementById('invite-emails').value;
-    var emails=raw.split(',').join('\n').split('\n').map(function(e){return e.trim();}).filter(function(e){return e.length>0;});
+    var nl=String.fromCharCode(10);
+    // Split by comma or newline
+    var emails=[];
+    var parts=raw.split(',');
+    for(var pi=0;pi<parts.length;pi++){
+        var subparts=parts[pi].split(nl);
+        for(var si=0;si<subparts.length;si++){
+            var e=subparts[si].trim();
+            if(e.length>0)emails.push(e);
+        }
+    }
     if(emails.length===0){alert('Please enter at least one email address.');return;}
     var nl=String.fromCharCode(10);
     var slotList=globalSlots.map(function(si){var s=typeof si==='string'?JSON.parse(si):si;return '  - '+s.display;}).join(nl);
